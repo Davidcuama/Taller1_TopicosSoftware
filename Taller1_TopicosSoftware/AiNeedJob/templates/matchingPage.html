@@ -1,0 +1,119 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Resultados de Matching - AI-Need-Job{% endblock %}
+
+{% block breadcrumb %}
+<nav style="margin-bottom: 1rem;">
+    <a href="{% url 'home' %}" style="color: var(--text-secondary); text-decoration: none;">
+        <i class="fas fa-home"></i> Inicio
+    </a>
+    <span style="margin: 0 0.5rem; color: var(--text-secondary);">/</span>
+    <span style="color: var(--text-primary); font-weight: 500;">Resultados de Matching</span>
+</nav>
+{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1 class="page-title">
+        <i class="fas fa-search"></i> Resultados de Coincidencia
+    </h1>
+    <p class="page-subtitle">
+        Análisis de compatibilidad entre CVs y vacante
+    </p>
+</div>
+
+<div class="card mb-3">
+    <div class="card-header">
+        <h3 class="card-title">
+            <i class="fas fa-briefcase"></i> Vacante Analizada
+        </h3>
+    </div>
+    <div class="card-content">
+        <p style="color: var(--text-secondary);">
+            {{ vacancy }}
+        </p>
+    </div>
+</div>
+
+{% if ranking %}
+    <div class="card">
+        <div class="card-header">
+            <h3 class="card-title">
+                <i class="fas fa-chart-line"></i> Ranking de Compatibilidad
+            </h3>
+        </div>
+        <div class="card-content">
+            <div class="list">
+                {% for item in ranking %}
+                    <div class="list-item">
+                        <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                            <div style="flex: 1;">
+                                <h4 style="margin-bottom: 0.5rem; color: var(--text-primary);">
+                                    {{ item.filename }}
+                                </h4>
+                                <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 0.5rem;">
+                                    <span class="badge {% if item.score >= 0.8 %}badge-success{% elif item.score >= 0.6 %}badge-warning{% else %}badge-error{% endif %}">
+                                        {{ item.score|floatformat:1 }}% Compatibilidad
+                                    </span>
+                                    {% if forloop.first %}
+                                        <span class="badge badge-info">Mejor Match</span>
+                                    {% endif %}
+                                </div>
+                                <div style="background: var(--background-color); padding: 1rem; border-radius: var(--radius-md); margin-top: 0.5rem;">
+                                    <h5 style="font-size: 0.9rem; font-weight: 600; color: var(--text-primary); margin-bottom: 0.5rem;">
+                                        <i class="fas fa-eye"></i> Vista Previa:
+                                    </h5>
+                                    <p style="font-size: 0.8rem; color: var(--text-secondary); margin: 0; white-space: pre-wrap; max-height: 100px; overflow-y: auto;">
+                                        {{ item.cv_text|truncatechars:300 }}
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    {% if best_cv %}
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">
+                    <i class="fas fa-trophy"></i> Mejor Coincidencia
+                </h3>
+            </div>
+            <div class="card-content">
+                <div style="text-align: center; padding: 2rem;">
+                    <i class="fas fa-trophy" style="font-size: 3rem; color: var(--warning-color); margin-bottom: 1rem;"></i>
+                    <h3 style="color: var(--text-primary); margin-bottom: 0.5rem;">
+                        {{ best_cv.filename }}
+                    </h3>
+                    <p style="color: var(--text-secondary); font-size: 1.1rem;">
+                        <strong>{{ best_cv.score|floatformat:1 }}%</strong> de compatibilidad
+                    </p>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+{% else %}
+    <div class="card text-center">
+        <div class="card-content">
+            <i class="fas fa-search" style="font-size: 3rem; color: var(--text-secondary); margin-bottom: 1rem;"></i>
+            <h3 style="color: var(--text-primary); margin-bottom: 0.5rem;">No se procesaron archivos</h3>
+            <p style="color: var(--text-secondary);">
+                No se encontraron CVs para analizar o hubo un error en el procesamiento.
+            </p>
+            <a href="{% url 'upload_cv' %}" class="btn btn-primary mt-2">
+                <i class="fas fa-upload"></i> Subir CVs
+            </a>
+        </div>
+    </div>
+{% endif %}
+
+<div class="text-center mt-3">
+    <a href="{% url 'upload_cv' %}" class="btn btn-outline">
+        <i class="fas fa-arrow-left"></i> Volver a Subir CVs
+    </a>
+</div>
+{% endblock %}

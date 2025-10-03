@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}AI-Need-Job{% endblock %}</title>
+    <link rel="stylesheet" href="{% load static %}{% static 'css/style.css' %}">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <a href="{% url 'home' %}" class="logo">
+                    <i class="fas fa-briefcase"></i> AI-Need-Job
+                </a>
+                
+                <nav class="nav">
+                    {% if user.is_authenticated %}
+                        {% if user.role == 'jobseeker' %}
+                            <a href="{% url 'feed' %}" class="nav-link">
+                                <i class="fas fa-search"></i> Vacantes
+                            </a>
+                            <a href="{% url 'upload_cv' %}" class="nav-link">
+                                <i class="fas fa-upload"></i> Subir CV
+                            </a>
+                        {% else %}
+                            <a href="{% url 'upload_vacancies' %}" class="nav-link">
+                                <i class="fas fa-plus"></i> Crear Vacante
+                            </a>
+                        {% endif %}
+                        <a href="{% url 'history' %}" class="nav-link">
+                            <i class="fas fa-history"></i> Historial
+                        </a>
+                        <a href="{% url 'notification_list' %}" class="nav-link">
+                            <i class="fas fa-bell"></i> Notificaciones
+                        </a>
+                    {% endif %}
+                </nav>
+                
+                <div class="user-info">
+                    {% if user.is_authenticated %}
+                        <div class="user-avatar">
+                            {{ user.first_name|first|upper }}{{ user.last_name|first|upper }}
+                        </div>
+                        <div>
+                            <div style="font-weight: 500; color: var(--text-primary);">
+                                {{ user.first_name }} {{ user.last_name }}
+                            </div>
+                            <div style="font-size: 0.8rem; color: var(--text-secondary);">
+                                {{ user.get_role_display }}
+                            </div>
+                        </div>
+                        <a href="{% url 'logout' %}" class="btn btn-outline btn-sm">
+                            <i class="fas fa-sign-out-alt"></i> Salir
+                        </a>
+                    {% else %}
+                        <a href="{% url 'login' %}" class="btn btn-primary btn-sm">
+                            <i class="fas fa-sign-in-alt"></i> Iniciar Sesión
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="main">
+        <div class="container">
+            {% if messages %}
+                <div class="messages">
+                    {% for message in messages %}
+                        <div class="message message-{{ message.tags }}">
+                            <i class="fas fa-{% if message.tags == 'success' %}check-circle{% elif message.tags == 'error' %}exclamation-circle{% elif message.tags == 'warning' %}exclamation-triangle{% else %}info-circle{% endif %}"></i>
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+
+            {% block breadcrumb %}{% endblock %}
+
+            {% block content %}{% endblock %}
+        </div>
+    </main>
+
+    <footer style="background: var(--surface-color); border-top: 1px solid var(--border-color); padding: 2rem 0; margin-top: 4rem;">
+        <div class="container text-center">
+            <p style="color: var(--text-secondary);">
+                © 2024 AI-Need-Job. Plataforma inteligente para búsqueda de empleo.
+            </p>
+        </div>
+    </footer>
+
+    <script>
+        // Simple JavaScript for enhanced UX
+        document.addEventListener('DOMContentLoaded', function() {
+            // Add fade-in animation to cards
+            const cards = document.querySelectorAll('.card, .list-item');
+            cards.forEach((card, index) => {
+                card.style.opacity = '0';
+                card.style.transform = 'translateY(20px)';
+                setTimeout(() => {
+                    card.style.transition = 'all 0.5s ease';
+                    card.style.opacity = '1';
+                    card.style.transform = 'translateY(0)';
+                }, index * 100);
+            });
+
+            // Auto-hide messages after 5 seconds
+            const messages = document.querySelectorAll('.message');
+            messages.forEach(message => {
+                setTimeout(() => {
+                    message.style.transition = 'opacity 0.5s ease';
+                    message.style.opacity = '0';
+                    setTimeout(() => message.remove(), 500);
+                }, 5000);
+            });
+        });
+    </script>
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

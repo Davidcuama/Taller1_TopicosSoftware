@@ -1,0 +1,116 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Subir CV - AI-Need-Job{% endblock %}
+
+{% block breadcrumb %}
+<nav style="margin-bottom: 1rem;">
+    <a href="{% url 'home' %}" style="color: var(--text-secondary); text-decoration: none;">
+        <i class="fas fa-home"></i> Inicio
+    </a>
+    <span style="margin: 0 0.5rem; color: var(--text-secondary);">/</span>
+    <span style="color: var(--text-primary); font-weight: 500;">Subir CV</span>
+</nav>
+{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1 class="page-title">
+        <i class="fas fa-upload"></i> Subir y Optimizar CV
+    </h1>
+    <p class="page-subtitle">
+        Sube tu currículum y mejóralo con inteligencia artificial para la vacante específica
+    </p>
+</div>
+
+<div class="flex justify-center">
+    <div class="card" style="max-width: 700px; width: 100%;">
+        <div class="card-header">
+            <h3 class="card-title">
+                <i class="fas fa-file-upload"></i> Información del CV
+            </h3>
+        </div>
+        <div class="card-content">
+            <form method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+                
+                <div class="form-group">
+                    <label for="{{ form.file.id_for_label }}" class="form-label">
+                        <i class="fas fa-file-pdf"></i> Archivo del CV (PDF o TXT)
+                    </label>
+                    {{ form.file }}
+                    {% if form.file.errors %}
+                        <div class="form-error">{{ form.file.errors.0 }}</div>
+                    {% endif %}
+                    <small style="color: var(--text-secondary); font-size: 0.8rem;">
+                        Formatos soportados: PDF, TXT. Máximo 10MB.
+                    </small>
+                </div>
+                
+                <div class="form-group">
+                    <label for="{{ form.image.id_for_label }}" class="form-label">
+                        <i class="fas fa-image"></i> Imagen del CV (Opcional)
+                    </label>
+                    {{ form.image }}
+                    {% if form.image.errors %}
+                        <div class="form-error">{{ form.image.errors.0 }}</div>
+                    {% endif %}
+                    <small style="color: var(--text-secondary); font-size: 0.8rem;">
+                        Imagen opcional para visualización. Formatos: JPG, PNG.
+                    </small>
+                </div>
+                
+                <div class="form-group">
+                    <label for="{{ form.vacancy.id_for_label }}" class="form-label">
+                        <i class="fas fa-briefcase"></i> Descripción de la Vacante
+                    </label>
+                    {{ form.vacancy }}
+                    {% if form.vacancy.errors %}
+                        <div class="form-error">{{ form.vacancy.errors.0 }}</div>
+                    {% endif %}
+                    <small style="color: var(--text-secondary); font-size: 0.8rem;">
+                        Describe la vacante para la cual quieres optimizar tu CV. Incluye requisitos, responsabilidades y habilidades deseadas.
+                    </small>
+                </div>
+                
+                <div class="form-group">
+                    <label for="{{ form.cv_text.id_for_label }}" class="form-label">
+                        <i class="fas fa-edit"></i> Texto del CV (Alternativo)
+                    </label>
+                    {{ form.cv_text }}
+                    {% if form.cv_text.errors %}
+                        <div class="form-error">{{ form.cv_text.errors.0 }}</div>
+                    {% endif %}
+                    <small style="color: var(--text-secondary); font-size: 0.8rem;">
+                        Si no tienes un archivo, puedes pegar el texto de tu CV aquí directamente.
+                    </small>
+                </div>
+                
+                <div style="display: flex; gap: 1rem; justify-content: center; margin-top: 2rem;">
+                    <button type="submit" class="btn btn-primary btn-lg">
+                        <i class="fas fa-upload"></i> Subir y Procesar CV
+                    </button>
+                    <a href="{% url 'history' %}" class="btn btn-outline btn-lg">
+                        <i class="fas fa-arrow-left"></i> Volver al Historial
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+{% if vacancy %}
+<div class="card mt-3" style="max-width: 700px; margin-left: auto; margin-right: auto;">
+    <div class="card-header">
+        <h3 class="card-title">
+            <i class="fas fa-info-circle"></i> Vacante Pre-seleccionada
+        </h3>
+    </div>
+    <div class="card-content">
+        <p style="color: var(--text-secondary);">
+            {{ vacancy }}
+        </p>
+    </div>
+</div>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,159 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Inicio - AI-Need-Job{% endblock %}
+
+{% block content %}
+<div class="page-header text-center">
+    <h1 class="page-title">¡Bienvenido, {{ user.first_name }}!</h1>
+    <p class="page-subtitle">
+        {% if user.role == 'jobseeker' %}
+            Encuentra tu trabajo ideal con la ayuda de la inteligencia artificial
+        {% else %}
+            Gestiona tus vacantes y encuentra el candidato perfecto
+        {% endif %}
+    </p>
+</div>
+
+<div class="stats">
+    {% if user.role == 'jobseeker' %}
+        <div class="stat-card">
+            <div class="stat-number">{{ user.resume_set.count }}</div>
+            <div class="stat-label">CVs Subidos</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-number">{{ user.applied_resume_set.count }}</div>
+            <div class="stat-label">Aplicaciones</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-number">{{ user.saved_vacancy_set.count }}</div>
+            <div class="stat-label">Vacantes Guardadas</div>
+        </div>
+    {% else %}
+        <div class="stat-card">
+            <div class="stat-number">{{ user.vacancies.count }}</div>
+            <div class="stat-label">Vacantes Publicadas</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-number">{{ open_vacancies_count }}</div>
+            <div class="stat-label">Vacantes Abiertas</div>
+        </div>
+    {% endif %}
+</div>
+
+<div class="grid grid-2">
+    {% if user.role == 'jobseeker' %}
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">
+                    <i class="fas fa-search"></i> Explorar Vacantes
+                </h3>
+            </div>
+            <div class="card-content">
+                <p>Descubre oportunidades laborales que se adapten a tu perfil profesional.</p>
+                <a href="{% url 'feed' %}" class="btn btn-primary">
+                    <i class="fas fa-search"></i> Ver Vacantes
+                </a>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">
+                    <i class="fas fa-upload"></i> Optimizar CV
+                </h3>
+            </div>
+            <div class="card-content">
+                <p>Sube tu CV y mejóralo con inteligencia artificial para cada vacante.</p>
+                <a href="{% url 'upload_cv' %}" class="btn btn-success">
+                    <i class="fas fa-upload"></i> Subir CV
+                </a>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">
+                    <i class="fas fa-history"></i> Mi Historial
+                </h3>
+            </div>
+            <div class="card-content">
+                <p>Revisa tus aplicaciones, CVs guardados y el progreso de tus postulaciones.</p>
+                <a href="{% url 'history' %}" class="btn btn-outline">
+                    <i class="fas fa-history"></i> Ver Historial
+                </a>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">
+                    <i class="fas fa-bell"></i> Notificaciones
+                </h3>
+            </div>
+            <div class="card-content">
+                <p>Mantente al día con las actualizaciones de tus aplicaciones.</p>
+                <a href="{% url 'notification_list' %}" class="btn btn-outline">
+                    <i class="fas fa-bell"></i> Ver Notificaciones
+                </a>
+            </div>
+        </div>
+    {% else %}
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">
+                    <i class="fas fa-plus"></i> Crear Vacante
+                </h3>
+            </div>
+            <div class="card-content">
+                <p>Publica nuevas oportunidades laborales y atrae a los mejores candidatos.</p>
+                <a href="{% url 'upload_vacancies' %}" class="btn btn-primary">
+                    <i class="fas fa-plus"></i> Nueva Vacante
+                </a>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">
+                    <i class="fas fa-users"></i> Gestionar Candidatos
+                </h3>
+            </div>
+            <div class="card-content">
+                <p>Revisa las aplicaciones recibidas y gestiona el proceso de selección.</p>
+                <a href="{% url 'history' %}" class="btn btn-success">
+                    <i class="fas fa-users"></i> Ver Candidatos
+                </a>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">
+                    <i class="fas fa-chart-bar"></i> Mis Vacantes
+                </h3>
+            </div>
+            <div class="card-content">
+                <p>Administra todas tus vacantes publicadas y su estado actual.</p>
+                <a href="{% url 'history' %}" class="btn btn-outline">
+                    <i class="fas fa-chart-bar"></i> Ver Vacantes
+                </a>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">
+                    <i class="fas fa-bell"></i> Notificaciones
+                </h3>
+            </div>
+            <div class="card-content">
+                <p>Recibe alertas sobre nuevas aplicaciones y actualizaciones.</p>
+                <a href="{% url 'notification_list' %}" class="btn btn-outline">
+                    <i class="fas fa-bell"></i> Ver Notificaciones
+                </a>
+            </div>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

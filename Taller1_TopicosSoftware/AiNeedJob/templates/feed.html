@@ -1,0 +1,82 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Vacantes Disponibles - AI-Need-Job{% endblock %}
+
+{% block breadcrumb %}
+<nav style="margin-bottom: 1rem;">
+    <a href="{% url 'home' %}" style="color: var(--text-secondary); text-decoration: none;">
+        <i class="fas fa-home"></i> Inicio
+    </a>
+    <span style="margin: 0 0.5rem; color: var(--text-secondary);">/</span>
+    <span style="color: var(--text-primary); font-weight: 500;">Vacantes</span>
+</nav>
+{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1 class="page-title">
+        <i class="fas fa-search"></i> Vacantes Disponibles
+    </h1>
+    <p class="page-subtitle">
+        Encuentra la oportunidad laboral perfecta para ti
+    </p>
+</div>
+
+{% if vacancies %}
+    <div class="grid">
+        {% for vacancy in vacancies %}
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">{{ vacancy.title }}</h3>
+                    <span class="badge badge-success">Abierta</span>
+                </div>
+                <div class="card-content">
+                    <p style="margin-bottom: 1rem; color: var(--text-secondary);">
+                        {{ vacancy.description|truncatewords:30 }}
+                    </p>
+                    
+                    {% if vacancy.requirements %}
+                        <div style="margin-bottom: 1rem;">
+                            <h4 style="font-size: 0.9rem; font-weight: 600; color: var(--text-primary); margin-bottom: 0.5rem;">
+                                <i class="fas fa-list-check"></i> Requisitos:
+                            </h4>
+                            <p style="font-size: 0.9rem; color: var(--text-secondary);">
+                                {{ vacancy.requirements|truncatewords:20 }}
+                            </p>
+                        </div>
+                    {% endif %}
+                    
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 1rem;">
+                        <div style="font-size: 0.8rem; color: var(--text-secondary);">
+                            <i class="fas fa-calendar"></i> 
+                            Publicada: {{ vacancy.uploaded_at|date:"d/m/Y" }}
+                        </div>
+                        <div style="display: flex; gap: 0.5rem;">
+                            <a href="{% url 'apply' vacancy.id %}" class="btn btn-primary btn-sm">
+                                <i class="fas fa-paper-plane"></i> Aplicar
+                            </a>
+                            <a href="{% url 'save' vacancy.id %}" class="btn btn-outline btn-sm">
+                                <i class="fas fa-bookmark"></i> Guardar
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+{% else %}
+    <div class="card text-center">
+        <div class="card-content">
+            <i class="fas fa-search" style="font-size: 3rem; color: var(--text-secondary); margin-bottom: 1rem;"></i>
+            <h3 style="color: var(--text-primary); margin-bottom: 0.5rem;">No hay vacantes disponibles</h3>
+            <p style="color: var(--text-secondary);">
+                En este momento no hay vacantes abiertas. Vuelve más tarde para ver nuevas oportunidades.
+            </p>
+            <a href="{% url 'home' %}" class="btn btn-primary mt-2">
+                <i class="fas fa-home"></i> Volver al Inicio
+            </a>
+        </div>
+    </div>
+{% endif %}
+{% endblock %}
