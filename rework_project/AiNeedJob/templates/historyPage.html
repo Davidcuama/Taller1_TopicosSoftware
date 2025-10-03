@@ -1,0 +1,243 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Historial - AI-Need-Job{% endblock %}
+
+{% block breadcrumb %}
+<nav style="margin-bottom: 1rem;">
+    <a href="{% url 'home' %}" style="color: var(--text-secondary); text-decoration: none;">
+        <i class="fas fa-home"></i> Inicio
+    </a>
+    <span style="margin: 0 0.5rem; color: var(--text-secondary);">/</span>
+    <span style="color: var(--text-primary); font-weight: 500;">Historial</span>
+</nav>
+{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1 class="page-title">
+        <i class="fas fa-history"></i> Mi Historial
+    </h1>
+    <p class="page-subtitle">
+        {% if user.role == 'jobseeker' %}
+            Revisa tus CVs, aplicaciones y vacantes guardadas
+        {% else %}
+            Gestiona tus vacantes y candidatos
+        {% endif %}
+    </p>
+</div>
+
+{% if user.role == 'jobseeker' %}
+    <!-- Job Seeker View -->
+    <div class="grid grid-2">
+        <!-- CVs Subidos -->
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">
+                    <i class="fas fa-file-alt"></i> CVs Subidos
+                </h3>
+                <span class="badge badge-info">{{ resumes.count }}</span>
+            </div>
+            <div class="card-content">
+                {% if resumes %}
+                    <div class="list">
+                        {% for resume in resumes %}
+                            <div class="list-item">
+                                <div style="display: flex; justify-content: space-between; align-items: center;">
+                                    <div>
+                                        <h4 style="margin-bottom: 0.5rem; color: var(--text-primary);">
+                                            {{ resume.name }}
+                                        </h4>
+                                        <p style="font-size: 0.8rem; color: var(--text-secondary); margin: 0;">
+                                            <i class="fas fa-calendar"></i> {{ resume.uploaded_at|date:"d/m/Y H:i" }}
+                                        </p>
+                                    </div>
+                                    <div>
+                                        <a href="{% url 'delete_cv' resume.id %}" class="btn btn-warning btn-sm" 
+                                           onclick="return confirm('¿Estás seguro de que quieres eliminar este CV?')">
+                                            <i class="fas fa-trash"></i>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="text-center">
+                        <i class="fas fa-file-alt" style="font-size: 2rem; color: var(--text-secondary); margin-bottom: 1rem;"></i>
+                        <p style="color: var(--text-secondary);">No has subido CVs aún.</p>
+                        <a href="{% url 'upload_cv' %}" class="btn btn-primary btn-sm">
+                            <i class="fas fa-upload"></i> Subir CV
+                        </a>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Aplicaciones Enviadas -->
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">
+                    <i class="fas fa-paper-plane"></i> Aplicaciones Enviadas
+                </h3>
+                <span class="badge badge-info">{{ applied_resumes.count }}</span>
+            </div>
+            <div class="card-content">
+                {% if applied_resumes %}
+                    <div class="list">
+                        {% for app in applied_resumes %}
+                            <div class="list-item">
+                                <div style="display: flex; justify-content: space-between; align-items: center;">
+                                    <div>
+                                        <h4 style="margin-bottom: 0.5rem; color: var(--text-primary);">
+                                            {{ app.vacancy.title }}
+                                        </h4>
+                                        <p style="font-size: 0.8rem; color: var(--text-secondary); margin: 0;">
+                                            <i class="fas fa-percentage"></i> Match: {{ app.match_rate|floatformat:1 }}% |
+                                            <i class="fas fa-calendar"></i> {{ app.applied_at|date:"d/m/Y" }}
+                                        </p>
+                                    </div>
+                                    <div>
+                                        <span class="badge {% if app.state == 'applied' %}badge-info{% elif app.state == 'interviewed' %}badge-warning{% elif app.state == 'rejected' %}badge-error{% endif %}">
+                                            {{ app.get_state_display }}
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="text-center">
+                        <i class="fas fa-paper-plane" style="font-size: 2rem; color: var(--text-secondary); margin-bottom: 1rem;"></i>
+                        <p style="color: var(--text-secondary);">No has aplicado a ninguna vacante.</p>
+                        <a href="{% url 'feed' %}" class="btn btn-primary btn-sm">
+                            <i class="fas fa-search"></i> Ver Vacantes
+                        </a>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Vacantes Guardadas -->
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">
+                    <i class="fas fa-bookmark"></i> Vacantes Guardadas
+                </h3>
+                <span class="badge badge-info">{{ saved_vacancies.count }}</span>
+            </div>
+            <div class="card-content">
+                {% if saved_vacancies %}
+                    <div class="list">
+                        {% for saved in saved_vacancies %}
+                            <div class="list-item">
+                                <div style="display: flex; justify-content: space-between; align-items: center;">
+                                    <div>
+                                        <h4 style="margin-bottom: 0.5rem; color: var(--text-primary);">
+                                            {{ saved.vacancy.title }}
+                                        </h4>
+                                        <p style="font-size: 0.8rem; color: var(--text-secondary); margin: 0;">
+                                            <i class="fas fa-calendar"></i> Guardada: {{ saved.saved_at|date:"d/m/Y" }}
+                                        </p>
+                                    </div>
+                                    <div style="display: flex; gap: 0.5rem;">
+                                        <a href="{% url 'apply' saved.vacancy.id %}" class="btn btn-primary btn-sm">
+                                            <i class="fas fa-paper-plane"></i> Aplicar
+                                        </a>
+                                        <a href="{% url 'unsave' saved.id %}" class="btn btn-outline btn-sm">
+                                            <i class="fas fa-trash"></i>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="text-center">
+                        <i class="fas fa-bookmark" style="font-size: 2rem; color: var(--text-secondary); margin-bottom: 1rem;"></i>
+                        <p style="color: var(--text-secondary);">No tienes vacantes guardadas.</p>
+                        <a href="{% url 'feed' %}" class="btn btn-primary btn-sm">
+                            <i class="fas fa-search"></i> Ver Vacantes
+                        </a>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+{% else %}
+    <!-- Recruiter View -->
+    <div class="grid">
+        {% for vacancy, resumes in vacancies_mapping.items %}
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">{{ vacancy.title }}</h3>
+                    <span class="badge {% if vacancy.state == 'open' %}badge-success{% else %}badge-warning{% endif %}">
+                        {{ vacancy.get_state_display }}
+                    </span>
+                </div>
+                <div class="card-content">
+                    <p style="color: var(--text-secondary); margin-bottom: 1rem;">
+                        {{ vacancy.description|truncatewords:20 }}
+                    </p>
+                    
+                    <h4 style="margin-bottom: 1rem; color: var(--text-primary);">
+                        <i class="fas fa-users"></i> Candidatos ({{ resumes|length }})
+                    </h4>
+                    
+                    {% if resumes %}
+                        <div class="list">
+                            {% for resume in resumes %}
+                                <div class="list-item">
+                                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                                        <div>
+                                            <h5 style="margin-bottom: 0.5rem; color: var(--text-primary);">
+                                                {{ resume.resume.name }}
+                                            </h5>
+                                            <p style="font-size: 0.8rem; color: var(--text-secondary); margin: 0;">
+                                                <i class="fas fa-percentage"></i> Match: {{ resume.match_rate|floatformat:1 }}% |
+                                                <i class="fas fa-calendar"></i> {{ resume.applied_at|date:"d/m/Y" }}
+                                            </p>
+                                        </div>
+                                        <div style="display: flex; gap: 0.5rem; align-items: center;">
+                                            <span class="badge {% if resume.state == 'applied' %}badge-info{% elif resume.state == 'interviewed' %}badge-warning{% elif resume.state == 'rejected' %}badge-error{% endif %}">
+                                                {{ resume.get_state_display }}
+                                            </span>
+                                            {% if resume.state == 'applied' %}
+                                                <a href="{% url 'accept_resume' resume.id %}" class="btn btn-success btn-sm">
+                                                    <i class="fas fa-check"></i> Aceptar
+                                                </a>
+                                                <a href="{% url 'reject_resume' resume.id %}" class="btn btn-warning btn-sm">
+                                                    <i class="fas fa-times"></i> Rechazar
+                                                </a>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <div class="text-center">
+                            <i class="fas fa-users" style="font-size: 2rem; color: var(--text-secondary); margin-bottom: 1rem;"></i>
+                            <p style="color: var(--text-secondary);">No hay aplicaciones para esta vacante.</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        {% empty %}
+            <div class="card text-center">
+                <div class="card-content">
+                    <i class="fas fa-briefcase" style="font-size: 3rem; color: var(--text-secondary); margin-bottom: 1rem;"></i>
+                    <h3 style="color: var(--text-primary); margin-bottom: 0.5rem;">No has publicado vacantes</h3>
+                    <p style="color: var(--text-secondary);">
+                        Comienza creando tu primera vacante para atraer candidatos.
+                    </p>
+                    <a href="{% url 'upload_vacancies' %}" class="btn btn-primary mt-2">
+                        <i class="fas fa-plus"></i> Crear Vacante
+                    </a>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+{% endif %}
+{% endblock %}

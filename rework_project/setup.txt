@@ -1,0 +1,109 @@
+Running the reworked AI‑Need‑Job project
+======================================
+
+This document explains how to set up and run the reworked version of the
+AI‑Need‑Job project created for **Taller 01**.  The project is a Django
+application designed to help job seekers generate optimized CVs for
+specific vacancies and allow recruiters to manage job postings.
+
+Prerequisites
+-------------
+
+1. **Python 3.10 or later**.  You can check your version with:
+
+   ```sh
+   python3 --version
+   ```
+
+2. **pip** (Python package manager) and optionally **virtualenv** to
+   create an isolated environment.
+
+3. **git** (only necessary if you plan to clone this repository from
+   GitHub).
+
+4. An **OpenAI API key** if you wish to use the embedding and chat
+   features.  Create a file named `openai_key.env` in the project root
+   with a line like `OPENAI_API_KEY=sk‑...` containing your key.  If no
+   key is provided, the application will fall back to a mock embedding
+   service and will not contact OpenAI.
+
+Installation and setup
+----------------------
+
+1. **Clone the repository** (or copy the reworked code into a new
+   directory):
+
+   ```sh
+   git clone <your-new-repo-url> ai-need-job
+   cd ai-need-job
+   ```
+
+2. **Create a virtual environment** (optional but recommended):
+
+   ```sh
+   python3 -m venv .venv
+   source .venv/bin/activate
+   ```
+
+3. **Install dependencies**.  The project relies on Django, numpy,
+   python‑docx, reportlab, PyPDF2, and the OpenAI Python client.  You
+   can install them using:
+
+   ```sh
+   pip install django numpy python-docx reportlab PyPDF2 python-dotenv openai
+   ```
+
+4. **Prepare the database**.  Django uses SQLite by default.  Apply
+   migrations to create the necessary tables:
+
+   ```sh
+python manage.py makemigrations users CVapp offer notifications
+python manage.py migrate
+   ```
+
+5. **Create a superuser** (optional).  This allows you to log in to the
+   Django admin interface and inspect models:
+
+   ```sh
+   python manage.py createsuperuser
+   ```
+
+6. **Run the development server**:
+
+   ```sh
+   python manage.py runserver
+   ```
+
+   Visit `http://127.0.0.1:8000/` in your browser to access the
+   application.  You can sign up as a job seeker or recruiter, post
+   vacancies, upload CVs, improve them using the AI service and apply
+   to vacancies.
+
+Notes
+-----
+
+* **Media and static files:** Uploaded profile pictures and CV images
+  will be stored in the `media/` directory in the project root.  The
+  development server will serve these files automatically when
+  `DEBUG = True`.
+
+* **OpenAI API integration:** If the `OPENAI_API_KEY` environment
+  variable is set, the application will use OpenAI's API for
+  embeddings and CV improvement.  Otherwise, random embeddings are
+  generated for demonstration purposes and the CV improvement feature
+  will return the original CV text.
+
+* **Extending the project:** This reworked version introduces a
+  structured service layer and class‑based views to make the code
+  easier to maintain and extend.  See the `CVapp/services.py` module
+  for examples of how to add new extraction strategies or embedding
+  providers.
+
+* **Sistema de notificaciones (BONO):** Se añadió un módulo de
+  notificaciones que informa al candidato cuando su CV es aceptado o
+  rechazado por un reclutador.  La funcionalidad se construye usando
+  el patrón de diseño *Observer*, lo cual permite registrar
+  observadores (por ejemplo, persistencia en la base de datos,
+  notificaciones por correo o WebSocket) sin acoplarlos a las vistas.
+  Los mensajes se muestran en la página `/notifications/` una vez que
+  el usuario inicie sesión.
